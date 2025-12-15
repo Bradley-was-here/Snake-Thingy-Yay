@@ -5,46 +5,124 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Snake – All Features</title>
   <style>
-    :root { --bg:#0b0f14; --panel:#121a24; --text:#e7f0ff; --muted:#9bb0cc; }
-    html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    .wrap { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+    :root{
+      --bg:#0b0f14;
+      --panel:#121a24;
+      --panel2:#0f1620;
+      --text:#e7f0ff;
+      --muted:#9bb0cc;
+      --stroke: rgba(155,176,204,.18);
+      --stroke2: rgba(155,176,204,.22);
+    }
+    html,body{ height:100%; margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    .wrap{ display:grid; grid-template-rows:auto 1fr auto; height:100%; }
+
     header{
       display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
-      padding: 12px 14px; background: linear-gradient(180deg, rgba(18,26,36,.95), rgba(18,26,36,.65));
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(18,26,36,.95), rgba(18,26,36,.65));
       position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px);
       border-bottom: 1px solid rgba(155,176,204,.15);
     }
-    .stats{ display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
-    .pill{ background: rgba(155,176,204,.10); border: 1px solid rgba(155,176,204,.18); padding: 6px 10px; border-radius: 999px; font-weight: 900; }
-    .pill span{ color: var(--muted); font-weight: 900; margin-right: 6px; }
-    .toolbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .tool{
-      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
-      font-weight: 900; color: var(--muted);
-      background: rgba(155,176,204,.08);
-      border: 1px solid rgba(155,176,204,.18);
-      border-radius: 12px; padding: 6px 10px;
-      max-width: min(980px, 96vw);
+    .stats{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .pill{ background: rgba(155,176,204,.10); border: 1px solid var(--stroke); padding: 6px 10px; border-radius: 999px; font-weight: 900; }
+    .pill span{ color: var(--muted); margin-right:6px; }
+
+    main{ padding: 10px; }
+    .board{
+      display:grid;
+      grid-template-columns: minmax(260px, 360px) 1fr minmax(260px, 360px);
+      gap: 12px;
+      align-items:start;
+      max-width: 1220px;
+      margin: 0 auto;
     }
-    .tool label{ display:flex; gap:6px; align-items:center; }
-    .tool small{ color: var(--muted); font-weight: 900; }
-    select, input, button{ font-weight: 900; }
+    @media (max-width: 980px){
+      .board{ grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      background: rgba(18,26,36,.75);
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 10px;
+      backdrop-filter: blur(8px);
+    }
+    .panel h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: .2px;
+      color: var(--muted);
+    }
+
+    details{
+      background: rgba(15,22,32,.55);
+      border: 1px solid rgba(155,176,204,.15);
+      border-radius: 14px;
+      padding: 8px 10px;
+      margin: 8px 0;
+    }
+    details[open]{ background: rgba(15,22,32,.75); border-color: rgba(155,176,204,.22); }
+    summary{
+      cursor: pointer;
+      user-select:none;
+      font-weight: 950;
+      color: var(--text);
+      list-style: none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    .sumRight{ color: var(--muted); font-weight: 900; font-size: 12px; }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 10px; }
+    .row .grow{ flex:1; min-width: 140px; }
+    .label{ font-weight: 900; color: var(--muted); font-size: 12px; }
+    select, input, button{
+      font-weight: 900;
+      font-family: inherit;
+      color: var(--text);
+    }
     select, input[type="number"]{
-      height: 30px; border-radius: 10px; border: 1px solid rgba(155,176,204,.22);
-      background: rgba(155,176,204,.10); color: var(--text); padding: 0 8px; outline: none;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke2);
+      background: rgba(155,176,204,.10);
+      padding: 0 10px;
+      outline: none;
+      width: 100%;
     }
     input[type="checkbox"]{ width:18px; height:18px; }
-    input[type="color"]{ width:44px; height:30px; padding:0; border:0; background:transparent; }
+    input[type="color"]{ width: 52px; height: 34px; padding:0; border:0; background: transparent; }
     button{
-      background: rgba(155,176,204,.12); border: 1px solid rgba(155,176,204,.22);
-      color: var(--text); padding: 8px 12px; border-radius: 10px; cursor: pointer;
+      background: rgba(155,176,204,.12);
+      border: 1px solid var(--stroke2);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
     }
     button:active{ transform: translateY(1px); }
-    main{ display:grid; place-items:center; padding: 10px; }
-    canvas{ background:#070a0e; border-radius: 18px; border: 2px solid rgba(155,176,204,.18); touch-action: none; }
+
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
+    .btnRow button{ flex: 1; min-width: 120px; }
+
+    .canvasWrap{ display:grid; place-items:center; }
+    canvas{
+      width: min(560px, 92vw);
+      height: auto;
+      aspect-ratio: 1 / 1;
+      background:#070a0e;
+      border-radius: 18px;
+      border: 2px solid rgba(155,176,204,.18);
+      touch-action: none;
+    }
     .hint{ color: var(--muted); font-size: 13px; padding: 8px 14px; text-align:center; }
+
+    footer{ padding: 10px 12px 16px; }
     .controls{
-      display:grid; gap:10px; padding: 10px 14px 16px;
+      display:grid; gap:10px;
       grid-template-columns: 1fr 1fr 1fr;
       max-width: 560px; width: min(560px, 96vw);
       margin: 0 auto;
@@ -58,8 +136,8 @@
     }
     .dpad button{ height: 56px; font-size: 18px; border-radius: 14px; }
     .empty{ visibility:hidden; }
-    .row{ display:flex; gap:10px; justify-content:center; grid-column: 1 / -1; }
-    .row button{ flex: 1; height: 44px; }
+    .row2{ display:flex; gap:10px; justify-content:center; grid-column: 1 / -1; }
+    .row2 button{ flex: 1; height: 44px; }
 
     .overlay{
       position: fixed; inset: 0; display:none; place-items:center;
@@ -69,7 +147,7 @@
     .card{
       width: min(720px, 94vw);
       background: rgba(18,26,36,.95);
-      border: 1px solid rgba(155,176,204,.22);
+      border: 1px solid var(--stroke2);
       border-radius: 18px; padding: 16px;
       box-shadow: 0 12px 44px rgba(0,0,0,.55);
       word-break: break-word;
@@ -78,10 +156,29 @@
     .card p{ margin: 8px 0; color: var(--muted); }
     kbd{
       background: rgba(155,176,204,.12);
-      border: 1px solid rgba(155,176,204,.22);
+      border: 1px solid var(--stroke2);
       padding: 2px 6px; border-radius: 8px;
       font-weight: 900; color: var(--text);
     }
+    .mini{ font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+    .checkgrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+      margin-top: 10px;
+    }
+    .check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(155,176,204,.14);
+      background: rgba(155,176,204,.06);
+    }
+
+    .danger{ border-color: rgba(255,107,107,.35); }
   </style>
 </head>
 <body>
@@ -93,105 +190,191 @@
       <div class="pill"><span>Speed</span><b id="spd">1</b></div>
       <div class="pill"><span>Mode</span><b id="modeLabel">Eat</b></div>
       <div class="pill"><span>Apples</span><b id="appleLabel">1</b></div>
-      <div class="pill"><span>Ver</span><b id="ver">v1.0.0</b></div>
+      <div class="pill"><span>Ver</span><b id="ver">v1.1.0</b></div>
       <div class="pill"><span>Shield</span><b id="shieldLabel">0</b></div>
       <div class="pill"><span>Slow</span><b id="slowLabel">0</b></div>
       <div class="pill"><span>Freeze</span><b id="freezeLabel">0</b></div>
       <div class="pill"><span>x2</span><b id="doubleLabel">0</b></div>
       <div class="pill"><span>Magnet</span><b id="magnetLabel">0</b></div>
     </div>
-
-    <div class="toolbar">
-      <div class="tool">Mode
-        <select id="modeSelect" aria-label="Mode">
-          <option value="eat">Eat apples</option>
-          <option value="dodge">Dodge apples</option>
-        </select>
-      </div>
-
-      <div class="tool">Apples
-        <input id="appleCount" type="number" min="1" max="12" step="1" value="1" aria-label="Apple count">
-      </div>
-
-      <div class="tool" title="Dodge mode: adds +1 apple every 8 points (up to 12).">
-        <input id="wavesToggle" type="checkbox">
-        Waves
-      </div>
-
-      <div class="tool" title="Dodge mode: apples speed up as you score.">
-        <input id="rampToggle" type="checkbox">
-        Speed ramp
-      </div>
-
-      <div class="tool" title="Power-ups: Off disables all power-up spawns. Custom lets you pick which ones can spawn.">
-        Power-ups
-        <select id="powerMode" aria-label="Power-up mode">
-          <option value="off">Off</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
-
-      <div class="tool" title="Choose which power-ups are allowed to spawn (Custom mode).">
-        <small>Enabled:</small>
-        <label><input id="pShield" type="checkbox">Shield</label>
-        <label><input id="pSlow" type="checkbox">Slow</label>
-        <label><input id="pFreeze" type="checkbox">Freeze</label>
-        <label><input id="pDouble" type="checkbox">x2</label>
-        <label><input id="pMagnet" type="checkbox">Magnet</label>
-        <label><input id="pShrink" type="checkbox">Shrink</label>
-      </div>
-
-      <div class="tool" title="Snake colors (saved on your device)">
-        <small>Snake</small>
-        <input id="snakeColor" type="color" value="#b7d7ff" aria-label="Snake color">
-        <small>Head</small>
-        <input id="headColor" type="color" value="#e7f0ff" aria-label="Head color">
-        <button id="resetColorsBtn" type="button">Reset</button>
-      </div>
-
-      <div class="tool" title="Unlock cosmetics by reaching milestones, then toggle them on/off anytime.">
-        <label><input id="bgEnable" type="checkbox">BG</label>
-        <select id="bgSelect" aria-label="Background select">
-          <option value="default">Default</option>
-        </select>
-        <label><input id="borderEnable" type="checkbox">Border</label>
-        <select id="borderSelect" aria-label="Border select">
-          <option value="default">Default</option>
-        </select>
-      </div>
-
-      <button id="pauseBtn" type="button">Pause</button>
-      <button id="restartBtn" type="button">Restart</button>
-    </div>
   </header>
 
   <main>
-    <canvas id="game" width="420" height="420" aria-label="Snake game canvas"></canvas>
+    <div class="board">
+      <!-- Left panel -->
+      <section class="panel" aria-label="Game settings">
+        <h3>Game</h3>
+
+        <details open>
+          <summary>
+            Play
+            <span class="sumRight">pause / restart</span>
+          </summary>
+          <div class="btnRow">
+            <button id="pauseBtn" type="button">Pause</button>
+            <button id="restartBtn" type="button">Restart</button>
+          </div>
+          <div class="btnRow">
+            <button id="slowBtn" type="button">- Speed</button>
+            <button id="fastBtn" type="button">+ Speed</button>
+          </div>
+          <div class="mini">Tip: Tap the board to pause on mobile.</div>
+        </details>
+
+        <details open>
+          <summary>
+            Mode
+            <span class="sumRight">eat / dodge</span>
+          </summary>
+          <div class="row">
+            <div class="grow">
+              <div class="label">Mode</div>
+              <select id="modeSelect" aria-label="Mode">
+                <option value="eat">Eat apples</option>
+                <option value="dodge">Dodge apples</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="checkgrid">
+            <label class="check" title="Dodge mode: adds +1 apple every 8 points (up to 12).">
+              <input id="wavesToggle" type="checkbox">
+              Waves
+            </label>
+            <label class="check" title="Dodge mode: apples speed up as you score.">
+              <input id="rampToggle" type="checkbox">
+              Speed ramp
+            </label>
+          </div>
+        </details>
+
+        <details open>
+          <summary>
+            Apples
+            <span class="sumRight">spawn count</span>
+          </summary>
+          <div class="row">
+            <div class="grow">
+              <div class="label">Apples at once (both modes)</div>
+              <input id="appleCount" type="number" min="1" max="12" step="1" value="1" aria-label="Apple count">
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Canvas -->
+      <section class="canvasWrap" aria-label="Game board">
+        <canvas id="game" width="560" height="560"></canvas>
+        <div class="hint">
+          Desktop: <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> • <kbd>Space</kbd>/<kbd>P</kbd> pause • <kbd>R</kbd> restart<br/>
+          Mobile: swipe to turn (easy). Tap board to pause.
+        </div>
+      </section>
+
+      <!-- Right panel -->
+      <section class="panel" aria-label="Cosmetics and power-ups">
+        <h3>Customize</h3>
+
+        <details open>
+          <summary>
+            Power-ups
+            <span class="sumRight">toggles</span>
+          </summary>
+          <div class="row">
+            <div class="grow">
+              <div class="label">Spawn mode</div>
+              <select id="powerMode" aria-label="Power-up mode">
+                <option value="off">Off</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="checkgrid" aria-label="Power toggles">
+            <label class="check"><input id="pShield" type="checkbox">Shield</label>
+            <label class="check"><input id="pSlow" type="checkbox">Slow</label>
+            <label class="check"><input id="pFreeze" type="checkbox">Freeze</label>
+            <label class="check"><input id="pDouble" type="checkbox">x2</label>
+            <label class="check"><input id="pMagnet" type="checkbox">Magnet</label>
+            <label class="check"><input id="pShrink" type="checkbox">Shrink</label>
+          </div>
+
+          <div class="mini">Power-ups are random spawns. Turn them off completely or pick which can appear.</div>
+        </details>
+
+        <details open>
+          <summary>
+            Snake colors
+            <span class="sumRight">body / head</span>
+          </summary>
+          <div class="grid2">
+            <div>
+              <div class="label">Body</div>
+              <input id="snakeColor" type="color" value="#b7d7ff" aria-label="Snake color">
+            </div>
+            <div>
+              <div class="label">Head</div>
+              <input id="headColor" type="color" value="#e7f0ff" aria-label="Head color">
+            </div>
+          </div>
+          <div class="btnRow">
+            <button id="resetColorsBtn" type="button">Reset colors</button>
+          </div>
+        </details>
+
+        <details open>
+          <summary>
+            Unlock cosmetics
+            <span class="sumRight">bg / border</span>
+          </summary>
+
+          <div class="grid2">
+            <div>
+              <label class="check">
+                <input id="bgEnable" type="checkbox">Enable BG
+              </label>
+              <div class="label">Background</div>
+              <select id="bgSelect" aria-label="Background select">
+                <option value="default">Default</option>
+              </select>
+              <div class="mini">Unlocks: 10 red, 20 blue, 30 green, 35 white, 40 yellow</div>
+            </div>
+            <div>
+              <label class="check">
+                <input id="borderEnable" type="checkbox">Enable border
+              </label>
+              <div class="label">Border</div>
+              <select id="borderSelect" aria-label="Border select">
+                <option value="default">Default</option>
+              </select>
+              <div class="mini">Unlocks: 15 orange, 25 neon green</div>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
   </main>
 
-  <div class="hint">
-    Desktop: <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> • <kbd>Space</kbd>/<kbd>P</kbd> pause • <kbd>R</kbd> restart<br/>
-    Mobile: swipe to turn (easy). Tap board to pause. Or use the buttons below.
-  </div>
+  <footer>
+    <div class="controls" aria-label="Mobile controls">
+      <div class="dpad">
+        <button class="empty" tabindex="-1" aria-hidden="true"></button>
+        <button id="upBtn" type="button">▲</button>
+        <button class="empty" tabindex="-1" aria-hidden="true"></button>
 
-  <footer class="controls" aria-label="Mobile controls">
-    <div class="dpad">
-      <button class="empty" tabindex="-1" aria-hidden="true"></button>
-      <button id="upBtn" type="button">▲</button>
-      <button class="empty" tabindex="-1" aria-hidden="true"></button>
+        <button id="leftBtn" type="button">◀</button>
+        <button id="pauseBtn2" type="button">⏯</button>
+        <button id="rightBtn" type="button">▶</button>
 
-      <button id="leftBtn" type="button">◀</button>
-      <button id="pauseBtn2" type="button">⏯</button>
-      <button id="rightBtn" type="button">▶</button>
+        <button class="empty" tabindex="-1" aria-hidden="true"></button>
+        <button id="downBtn" type="button">▼</button>
+        <button class="empty" tabindex="-1" aria-hidden="true"></button>
+      </div>
 
-      <button class="empty" tabindex="-1" aria-hidden="true"></button>
-      <button id="downBtn" type="button">▼</button>
-      <button class="empty" tabindex="-1" aria-hidden="true"></button>
-    </div>
-
-    <div class="row">
-      <button id="slowBtn" type="button">- Speed</button>
-      <button id="fastBtn" type="button">+ Speed</button>
+      <div class="row2">
+        <button id="restartBtn2" type="button">Restart</button>
+        <button id="muteHints" type="button">Hide hints</button>
+      </div>
     </div>
   </footer>
 </div>
@@ -237,6 +420,7 @@
     ctx.closePath();
   }
 
+  // Geometry
   const GRID = 21;
   const cell = Math.floor(Math.min(canvas.width, canvas.height) / GRID);
   const pad = Math.floor((canvas.width - cell * GRID) / 2);
@@ -278,9 +462,12 @@
   const pauseBtn = document.getElementById('pauseBtn');
   const pauseBtn2 = document.getElementById('pauseBtn2');
   const restartBtn = document.getElementById('restartBtn');
+  const restartBtn2 = document.getElementById('restartBtn2');
   const playAgain = document.getElementById('playAgain');
   const overlay = document.getElementById('overlay');
   const overText = document.getElementById('overText');
+  const hintEl = document.querySelector('.hint');
+  const muteHintsBtn = document.getElementById('muteHints');
 
   const upBtn = document.getElementById('upBtn');
   const downBtn = document.getElementById('downBtn');
@@ -313,7 +500,7 @@
   };
   const DEFAULT_BG = '#070a0e';
 
-  // Cosmetic unlocks (predetermined milestones)
+  // Cosmetic unlocks
   const BG_UNLOCKS = [
     { score: 10, id: 'red',    name: 'Red (10)',    color: '#ff2d2d' },
     { score: 20, id: 'blue',   name: 'Blue (20)',   color: '#2d6bff' },
@@ -438,6 +625,7 @@
   const PREF_KEY = 'snake_prefs_all_v1';
   const HS_EAT = 'snake_hs_eat_all_v1';
   const HS_DODGE = 'snake_hs_dodge_all_v1';
+  const HINTS_KEY = 'snake_hints_hidden_all_v1';
 
   let prefs = loadJson(PREF_KEY, {
     mode:'eat', apples:1, waves:true, ramp:true,
@@ -480,6 +668,17 @@
   pMagnet.checked = !!enabledPowers.magnet;
   pShrink.checked = !!enabledPowers.shrink;
 
+  // Hints toggle
+  const hintsHidden = !!loadJson(HINTS_KEY, false);
+  if (hintsHidden) hintEl.style.display = 'none';
+  muteHintsBtn.textContent = hintsHidden ? 'Show hints' : 'Hide hints';
+  muteHintsBtn.addEventListener('click', () => {
+    const nowHidden = hintEl.style.display !== 'none';
+    hintEl.style.display = nowHidden ? 'none' : '';
+    saveJson(HINTS_KEY, nowHidden);
+    muteHintsBtn.textContent = nowHidden ? 'Show hints' : 'Hide hints';
+  });
+
   function powerSpawnsEnabled(){ return powerMode !== 'off'; }
   function enabledPowerList(){
     const list = [];
@@ -511,7 +710,6 @@
     const pos = randomFreeCell();
     powerUp = { x: pos.x, y: pos.y, type };
     powerAge = 0;
-    toast('Power-up spawned: ' + type);
   }
 
   function applyPowerUp(type){
@@ -548,9 +746,9 @@
     }
   }
 
-  // Difficulty timing
+  // Timing
   let speedLevel = prefs.speedLevel;
-  let tickMsBase = 120;
+  const tickMsBase = 120;
   let tickMs = tickMsBase;
   function setSpeed(level){
     speedLevel = Math.max(1, Math.min(10, level));
@@ -639,7 +837,7 @@
     const disabled = (powerMode === 'off');
     for (const el of [pShield,pSlow,pFreeze,pDouble,pMagnet,pShrink]){
       el.disabled = disabled;
-      if (el.parentElement) el.parentElement.style.opacity = disabled ? 0.5 : 1;
+      if (el.parentElement) el.parentElement.style.opacity = disabled ? 0.55 : 1;
     }
   }
 
@@ -920,7 +1118,7 @@
     else if (k === 'arrowright' || k === 'd') requestDir({x:1,y:0});
   }, { passive:false });
 
-  // Swipe + tap to pause
+  // Swipe + tap to pause (easy sensitivity)
   let touchStart = null;
   let didSwipe = false;
   function getTouchPos(ev){
@@ -959,6 +1157,7 @@
   pauseBtn.addEventListener('click', togglePause);
   pauseBtn2.addEventListener('click', togglePause);
   restartBtn.addEventListener('click', () => reset());
+  restartBtn2.addEventListener('click', () => reset());
   playAgain.addEventListener('click', () => reset());
 
   upBtn.addEventListener('click', () => requestDir({x:0,y:-1}));
@@ -996,13 +1195,13 @@
   powerModeSelect.addEventListener('change', applySettingsAndRestart);
   [pShield,pSlow,pFreeze,pDouble,pMagnet,pShrink].forEach(el => el.addEventListener('change', applySettingsAndRestart));
 
-  // Pre-flight check
+  // Pre-flight check (double-check): required elements exist
   const required = [
     'score','high','spd','modeLabel','appleLabel','ver','shieldLabel','slowLabel','freezeLabel','doubleLabel','magnetLabel',
     'modeSelect','appleCount','wavesToggle','rampToggle','powerMode','pShield','pSlow','pFreeze','pDouble','pMagnet','pShrink',
     'snakeColor','headColor','resetColorsBtn','bgEnable','bgSelect','borderEnable','borderSelect',
-    'pauseBtn','pauseBtn2','restartBtn','playAgain','overlay','overText','game',
-    'upBtn','downBtn','leftBtn','rightBtn','slowBtn','fastBtn'
+    'pauseBtn','pauseBtn2','restartBtn','restartBtn2','playAgain','overlay','overText','game',
+    'upBtn','downBtn','leftBtn','rightBtn','slowBtn','fastBtn','muteHints'
   ];
   for (const id of required){
     if (!document.getElementById(id)) throw new Error('Missing element: ' + id);
